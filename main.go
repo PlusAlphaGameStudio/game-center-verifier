@@ -50,11 +50,11 @@ func handleGameCenterAuth(body []byte, corrId string, replyTo string) bool {
 	var authData GameCenterAuthData
 	err := json.Unmarshal(body, &authData)
 	if err != nil {
-		_ = replyQueue.Push([]byte("false"), "", "")
+		_ = replyQueue.Push([]byte("false"), corrId, "")
 	} else {
 		playerId, err := verifyGameCenterAuth(&authData)
 		if err != nil {
-			_ = replyQueue.Push([]byte("false"), "", "")
+			_ = replyQueue.Push([]byte("false"), corrId, "")
 		} else {
 			playerInfo := PlayerInfo{PlayerId: playerId}
 			playerInfoJson, err := json.Marshal(&playerInfo)
