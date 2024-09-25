@@ -47,21 +47,32 @@ func main() {
 func handleGameCenterAuth(body []byte, corrId string, replyTo string) bool {
 	replyQueue := rabbitmq.New(replyTo, os.Getenv("FCMCG_RMQ_ADDR"), false, true, true)
 
+	<-time.After(1 * time.Second)
+
 	var authData GameCenterAuthData
 	err := json.Unmarshal(body, &authData)
 	if err != nil {
-		_ = replyQueue.Push([]byte("false"), corrId, "")
+		err := replyQueue.Push([]byte("false"), corrId, "")
+		if err != nil {
+			log.Println(err)
+		}
 	} else {
 		playerId, err := verifyGameCenterAuth(&authData)
 		if err != nil {
-			_ = replyQueue.Push([]byte("false"), corrId, "")
+			err := replyQueue.Push([]byte("false"), corrId, "")
+			if err != nil {
+				log.Println(err)
+			}
 		} else {
 			playerInfo := PlayerInfo{PlayerId: playerId}
 			playerInfoJson, err := json.Marshal(&playerInfo)
 			if err != nil {
 				return false
 			}
-			_ = replyQueue.Push(playerInfoJson, corrId, "")
+			err = replyQueue.Push(playerInfoJson, corrId, "")
+			if err != nil {
+				log.Println(err)
+			}
 		}
 	}
 

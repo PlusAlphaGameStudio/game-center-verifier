@@ -6,6 +6,7 @@ import (
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -199,6 +200,11 @@ func (client *Client) handleReInit(conn *amqp.Connection, exclusive bool, autoDe
 		err := client.init(conn, exclusive, autoDelete, passive)
 		if err != nil {
 			client.errLog.Println("failed to initialize channel, retrying...")
+
+			if strings.HasPrefix(client.QueueName(), "amq.") && passive {
+				// 다시 초기화하지 않고 그냥 포기한다.
+				return false
+			}
 
 			select {
 			case <-client.done:
