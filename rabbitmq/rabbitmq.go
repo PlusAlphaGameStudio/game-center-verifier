@@ -46,7 +46,7 @@ func (client *Client) Push(data []byte, corrId string, replyTo string) error {
 		}
 		confirm := <-client.notifyConfirm
 		if confirm.Ack {
-			client.infoLog.Printf("push confirmed [%d]", confirm.DeliveryTag)
+			client.infoLog.Printf("push confirmed [deliveryTag=%s, corrId=%s]", confirm.DeliveryTag, corrId)
 			return nil
 		}
 	}
@@ -132,7 +132,7 @@ func (client *Client) connect(addr string) (*amqp.Connection, error) {
 	}
 
 	client.changeConnection(conn)
-	client.infoLog.Println("connected")
+	client.infoLog.Println("'%s' connected", addr)
 	return conn, nil
 }
 
@@ -169,11 +169,11 @@ func (client *Client) handleReconnect(addr string, exclusive bool, autoDelete bo
 		client.isReady = false
 		client.m.Unlock()
 
-		client.infoLog.Println("attempting to connect")
+		client.infoLog.Println("attempting to connect '%s'", addr)
 
 		conn, err := client.connect(addr)
 		if err != nil {
-			client.errLog.Println("failed to connect. Retrying...")
+			client.errLog.Println("failed to connect '%s'. Retrying...", addr)
 
 			select {
 			case <-client.done:
