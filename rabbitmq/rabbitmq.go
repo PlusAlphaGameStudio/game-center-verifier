@@ -46,7 +46,7 @@ func (client *Client) Push(data []byte, corrId string, replyTo string) error {
 		}
 		confirm := <-client.notifyConfirm
 		if confirm.Ack {
-			client.infoLog.Printf("push confirmed [deliveryTag=%s, corrId=%s]", confirm.DeliveryTag, corrId)
+			client.infoLog.Printf("push confirmed [deliveryTag=%v, corrId=%v]", confirm.DeliveryTag, corrId)
 			return nil
 		}
 	}

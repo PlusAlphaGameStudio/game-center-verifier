@@ -58,6 +58,9 @@ func handleGameCenterAuth(body []byte, corrId string, replyTo string) bool {
 		}
 	} else {
 		playerId, err := verifyGameCenterAuth(&authData)
+
+		log.Printf("verifyGameCenterAuth result: playerId=%v, err=%v", playerId, err)
+
 		if err != nil {
 			err := replyQueue.Push([]byte("false"), corrId, "")
 			if err != nil {
