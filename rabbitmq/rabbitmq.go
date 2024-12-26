@@ -126,7 +126,9 @@ func (client *Client) QueueName() string {
 
 // connect will create a new AMQP connection
 func (client *Client) connect(addr string) (*amqp.Connection, error) {
-	conn, err := amqp.Dial(addr)
+	config := amqp.Config{Properties: amqp.NewConnectionProperties()}
+	config.Properties.SetClientConnectionName(os.Args[0])
+	conn, err := amqp.DialConfig(addr, config)
 	if err != nil {
 		return nil, err
 	}
