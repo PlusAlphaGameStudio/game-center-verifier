@@ -31,10 +31,13 @@ type GameCenterAuthData struct {
 func main() {
 	goDotErr := godotenv.Load()
 	if goDotErr != nil {
-		log.Println("Error loading .env file")
+		log.Panic("Error loading .env file")
 	}
 
 	gameCenterAuthQueue := rabbitmq.New("game_center_auth_queue", os.Getenv("FCMCG_RMQ_ADDR"), false, false, false)
+	defer func(gameCenterAuthQueue *rabbitmq.Client) {
+		_ = gameCenterAuthQueue.Close()
+	}(gameCenterAuthQueue)
 
 	<-time.After(1 * time.Second)
 
@@ -46,6 +49,9 @@ func main() {
 
 func handleGameCenterAuth(body []byte, corrId string, replyTo string) bool {
 	replyQueue := rabbitmq.New(replyTo, os.Getenv("FCMCG_RMQ_ADDR"), false, true, true)
+	defer func(replyQueue *rabbitmq.Client) {
+		_ = replyQueue.Close()
+	}(replyQueue)
 
 	<-time.After(1 * time.Second)
 
