@@ -27,6 +27,8 @@ func New(queueName, addr string, exclusive bool, autoDelete bool, passive bool) 
 // This will block until the server sends a confirmation. Errors are
 // only returned if the push action itself fails, see UnsafePush.
 func (client *Client) Push(data []byte, corrId string, replyTo string) error {
+	log.Printf("Pushing %v bytes to queue '%v', corrId=%v, replyTo=%v", len(data), client.queueName, corrId, replyTo)
+
 	client.m.Lock()
 	if !client.isReady {
 		client.m.Unlock()
